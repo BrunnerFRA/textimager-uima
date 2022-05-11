@@ -2,6 +2,7 @@ package org.hucompute.textimager.fasttext.languageidentification;
 
 import com.github.jfasttext.JFastText;
 import de.tudarmstadt.ukp.dkpro.core.api.ner.type.Language;
+import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Paragraph;
 import de.tudarmstadt.ukp.dkpro.core.api.segmentation.type.Sentence;
 import org.apache.uima.UimaContext;
 import org.apache.uima.analysis_engine.AnalysisEngineProcessException;
@@ -69,6 +70,9 @@ public class LanguageIdentificationPercentage extends JCasAnnotator_ImplBase{
 		};
 	}
 
+	/*
+
+	// Sentencewise
 	@Override
 	public void process(JCas aJCas) throws AnalysisEngineProcessException {
 		modelProvider.configure(aJCas.getCas());
@@ -78,6 +82,22 @@ public class LanguageIdentificationPercentage extends JCasAnnotator_ImplBase{
 			Language lang = new Language(aJCas);
 			lang.setBegin(sentence.getBegin());
 			lang.setEnd(sentence.getEnd());
+			lang.setValue(foundLanguage);
+			lang.addToIndexes(aJCas);
+		}
+	}
+	*/
+	// Paragraphwise - only difference is the class that is iterated upon...
+	@Override
+	public void process(JCas aJCas) throws AnalysisEngineProcessException {
+		modelProvider.configure(aJCas.getCas());
+		// Just select Paragraph.class instead of Sentence.class....
+		for (Paragraph paragraph : JCasUtil.select(aJCas, Paragraph.class)) {
+			JFastText.ProbLabel probLabel = modelProvider.getResource().predictProba(paragraph.getCoveredText());
+			String foundLanguage = probLabel.label.replace("__label__", "");
+			Language lang = new Language(aJCas);
+			lang.setBegin(paragraph.getBegin());
+			lang.setEnd(paragraph.getEnd());
 			lang.setValue(foundLanguage);
 			lang.addToIndexes(aJCas);
 		}

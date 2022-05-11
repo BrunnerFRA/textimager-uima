@@ -91,7 +91,7 @@ public class LanguageIdentification extends JCasAnnotator_ImplBase{
 
 		AnalysisEngineDescription language = createEngineDescription(LanguageIdentification.class);
 
-		JCas test = JCasFactory.createText("Dies ist ein schöner Text.");
+		JCas test = JCasFactory.createText("Dies ist ein schöner Text. This is a nice text.");
 
 		SimplePipeline.runPipeline(test, language);
 
